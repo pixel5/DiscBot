@@ -1,0 +1,11 @@
+{
+  "name": "DiscBot",
+  "version": "0.1.0",
+  "description": "Fetches information about disc golf discs.",
+  "main": "bot.js",
+  "author": "pixel5",
+  "dependencies": {
+    "discord.io": "^2.5.3",
+    "winston": "^3.2.1"
+  }
+}
