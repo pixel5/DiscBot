@@ -37,26 +37,63 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 });
             break;
             case 'disc':
-                var urlDiscName = args.replace(/\s+/g, '-').toLowerCase();
-                var url = 'https://www.pdga.com/technical-standards/equipment-certification/discs/' + urlDiscName;
+				logger.info(args);
+				var replyText = [];
+				var options = {
+					uri: 'https://api.pixel5.us/discbot/disc/' + args.replace(",", "%20"),
+					//qs: {
+					//	access_token: 'xxxxx xxxxx' // -> uri + '?access_token=xxxxx%20xxxxx'
+					//},
+					headers: {
+						'User-Agent': 'Request-Promise'
+					},
+					json: true // Automatically parses the JSON string in the response
+				};
+				rp(options)
+					.then(function (disc) {
+						var pdgaName = disc.pdga_name;
+						delete disc.id;
+						delete disc.pdga_name;
+						for(var p in disc) {
+							if (disc[p]) {
+								replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + disc[p])
+							}
+						}
+						
+						bot.sendMessage({
+							to: channelID,
+							message: '```' + replyText.join('\n') + '```'
+						});
+					})
+					.catch(function (err) {
+						// API call failed...
+						bot.sendMessage({
+							to: channelID,
+							message: 'No disc found by that name.'
+						});
+					}
+				);
+			
+                // var urlDiscName = args.replace(/\s+/g, '-').toLowerCase();
+                // var url = 'https://www.pdga.com/technical-standards/equipment-certification/discs/' + urlDiscName;
 
-                rp(url)
-                  .then(function(html){
-                    //success!
-                    var messageList = [];
-                    cheerio('.views-row > div', html).each(function(index, element) {
-                        messageList[index] = cheerio(this).text();
-                    });
+                // rp(url)
+                  // .then(function(html){
+                    // //success!
+                    // var messageList = [];
+                    // cheerio('.views-row > div', html).each(function(index, element) {
+                        // messageList[index] = cheerio(this).text();
+                    // });
 
-                    bot.sendMessage({
-                        to: channelID,
-                        message: messageList.join('\n')
-                    });
-                  })
-                  .catch(function(err){
-                    //handle error
-                    logger.info('An error occurred fetching information.');
-                  });
+                    // bot.sendMessage({
+                        // to: channelID,
+                        // message: messageList.join('\n')
+                    // });
+                  // })
+                  // .catch(function(err){
+                    // //handle error
+                    // logger.info('An error occurred fetching information.');
+                  // });
             break;
             // Just add any case commands if you want to..
          }
