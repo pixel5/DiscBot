@@ -106,7 +106,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
 				);
             break;
             case 'discupdate':
-                logger.info(message.member);
+                logger.info(message.user);
                 // if (message.member.roles.get('585543893244837899')) {
                 //     bot.sendMessage({
                 //         to: channelID,
