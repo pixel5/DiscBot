@@ -133,6 +133,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
                         rp(options)
                             .then(function (parsedBody) {
+                                logger.info(parsedBody);
                                 // POST succeeded...
                                 bot.sendMessage({
                                     to: channelID,
@@ -140,6 +141,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                 });
                             })
                             .catch(function (err) {
+                                logger.info(err);
                                 // POST failed...
                                 bot.sendMessage({
                                     to: channelID,
