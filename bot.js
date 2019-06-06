@@ -71,7 +71,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 logger.info(args);
 				var replyText = [];
 				var options = {
-					uri: 'https://' + auth.pixel5_api + '\@api.pixel5.us/discbot/disc/' + args.replace(",", "%20"),
+					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/disc/' + args.replace(",", "%20"),
 					//qs: {
 					//	access_token: 'xxxxx xxxxx' // -> uri + '?access_token=xxxxx%20xxxxx'
 					//},
@@ -104,6 +104,20 @@ bot.on('message', function (user, userID, channelID, message, event) {
 						});
 					}
 				);
+            break;
+            case 'discupdate':
+                if (message.member.roles.get('585543893244837899')) {
+                    bot.sendMessage({
+                        to: channelID,
+                        message: 'Disc Update',
+                    });
+                }
+                else {
+                    bot.sendMessage({
+                        to: channelID,
+                        message: 'You do not have permission to update discs.',
+                    });
+                }
             break;
             // Just add any case commands if you want to..
          }
