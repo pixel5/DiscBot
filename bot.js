@@ -36,6 +36,37 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     message: 'Pong!'
                 });
             break;
+            case 'disc-doesnt-hit-trees':
+                bot.sendMessage({
+                    to: channelID,
+                    message: '<:DGGIT:585849585323343892> <:DGGUD:585849585176412182>'
+                });
+            break;
+            case 'pdga':
+                var url = 'https://www.pdga.com/player/' + args;
+
+                rp(url)
+                  .then(function(html){
+                    //success!
+                    var messageList = [];
+                    // Name
+                    messageList.push(cheerio('.pane-page-title > .pane-content', html).text());
+
+                    // Details
+                    cheerio('ul.player-info > li', html).each(function(index, element) {
+                        messageList.push(cheerio(this).text());
+                    });
+
+                    bot.sendMessage({
+                        to: channelID,
+                        message: '```' + messageList.join('\n') + '```' + url
+                    });
+                  })
+                  .catch(function(err){
+                    //handle error
+                    logger.info('An error occurred fetching information.');
+                  });
+            break;
             case 'disc':
                 logger.info(args);
 				var replyText = [];
@@ -59,7 +90,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
 								replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + disc[p])
 							}
 						}
-						
+
 						bot.sendMessage({
 							to: channelID,
 							message: '```' + replyText.join('\n') + '```'
@@ -73,29 +104,14 @@ bot.on('message', function (user, userID, channelID, message, event) {
 						});
 					}
 				);
-			
-                // var urlDiscName = args.replace(/\s+/g, '-').toLowerCase();
-                // var url = 'https://www.pdga.com/technical-standards/equipment-certification/discs/' + urlDiscName;
-
-                // rp(url)
-                  // .then(function(html){
-                    // //success!
-                    // var messageList = [];
-                    // cheerio('.views-row > div', html).each(function(index, element) {
-                        // messageList[index] = cheerio(this).text();
-                    // });
-
-                    // bot.sendMessage({
-                        // to: channelID,
-                        // message: messageList.join('\n')
-                    // });
-                  // })
-                  // .catch(function(err){
-                    // //handle error
-                    // logger.info('An error occurred fetching information.');
-                  // });
             break;
             // Just add any case commands if you want to..
          }
+     }
+     else if (message.includes('<@585833915957379101> sucks') || message.includes('failed bot') || message.includes('bad bot')) {
+         bot.sendMessage({
+             to: channelID,
+             message: 'Here\'s an idea, <@' + userID + '>, how about you stop throwing nose-up.'
+         });
      }
 });
