@@ -115,19 +115,13 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         var fnMatch = args.match(/(\-?\d{1,3}\d*\.?\d*\/){3,4}\-?\d{1,2}\d*\.?\d*/);
                         var flightNumbers = fnMatch[0];
                         var discName = args.toString().replace(flightNumbers, '');
-                        flightNumbers = flightNumbers.toString().split('/');
 
                         var options = {
-                            method: 'POST',
-                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/discupdate',
-                            body: {
-                                'name': discName,
-                                'speed': flightNumbers[0],
-                                'glide': flightNumbers[1],
-                                'turn': flightNumbers[2],
-                                'fade': flightNumbers[3],
-                                'stability': (typeof flightNumbers[4] == "undefined") ? null : flightNumbers[4]
-                            },
+                            method: 'GET',
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/discupdate/' + discName.replace(",", "%20") + flightNumbers,
+                            headers: {
+        						'User-Agent': 'Request-Promise'
+        					},
                             json: true // Automatically stringifies the body to JSON
                         };
 
