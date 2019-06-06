@@ -121,12 +121,12 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             method: 'POST',
                             uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/discupdate',
                             body: {
-                                name: discName,
-                                speed: flightNumbers[0],
-                                glide: flightNumbers[1],
-                                turn: flightNumbers[2],
-                                fade: flightNumbers[3],
-                                stability: (typeof flightNumbers[4] == "undefined") ? null : flightNumbers[4]
+                                'name': discName,
+                                'speed': flightNumbers[0],
+                                'glide': flightNumbers[1],
+                                'turn': flightNumbers[2],
+                                'fade': flightNumbers[3],
+                                'stability': (typeof flightNumbers[4] == "undefined") ? null : flightNumbers[4]
                             },
                             json: true // Automatically stringifies the body to JSON
                         };
