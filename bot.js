@@ -115,7 +115,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         var fnMatch = args.match(/(\-?\d{1,3}\d*\.?\d*\/){3,4}\-?\d{1,2}\d*\.?\d*/);
                         var flightNumbers = fnMatch[0];
                         var discName = args.toString().replace(',' + flightNumbers, '');
-logger.info(flightNumbers);
+
                         var options = {
                             method: 'GET',
                             uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/discupdate/' + discName.replace(",", "%20").trim() + '/' + flightNumbers,
