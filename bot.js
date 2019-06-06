@@ -111,7 +111,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 break;
                 case 'discupdate':
                     //logger.info(message.author.id);
-                    if (bot.servers[event.d.guild_id].members[userID].roles.includes('585543893244837899'))) {
+                    if (bot.servers[event.d.guild_id].members[userID].roles.includes('585543893244837899')) {
                         bot.sendMessage({
                             to: channelID,
                             message: 'Disc Update',
