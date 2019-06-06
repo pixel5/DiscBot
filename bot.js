@@ -37,7 +37,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 });
             break;
             case 'disc':
-				logger.info(args);
+                logger.info(args);
 				var replyText = [];
 				var options = {
 					uri: 'https://api.pixel5.us/discbot/disc/' + args.replace(",", "%20"),
