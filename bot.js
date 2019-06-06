@@ -106,18 +106,19 @@ bot.on('message', function (user, userID, channelID, message, event) {
 				);
             break;
             case 'discupdate':
-                if (message.member.roles.get('585543893244837899')) {
-                    bot.sendMessage({
-                        to: channelID,
-                        message: 'Disc Update',
-                    });
-                }
-                else {
-                    bot.sendMessage({
-                        to: channelID,
-                        message: 'You do not have permission to update discs.',
-                    });
-                }
+                logger.info(member);
+                // if (message.member.roles.get('585543893244837899')) {
+                //     bot.sendMessage({
+                //         to: channelID,
+                //         message: 'Disc Update',
+                //     });
+                // }
+                // else {
+                //     bot.sendMessage({
+                //         to: channelID,
+                //         message: 'You do not have permission to update discs.',
+                //     });
+                // }
             break;
             // Just add any case commands if you want to..
          }
