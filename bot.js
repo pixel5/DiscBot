@@ -106,7 +106,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
 				);
             break;
             case 'discupdate':
-                if (message.member.roles.has('585543893244837899')) {
+                if (message.user.roles.has('585543893244837899')) {
                     logger.info('has role');
                 }
                 else {
