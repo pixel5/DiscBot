@@ -112,7 +112,8 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 case 'discupdate':
                     //logger.info(message.author.id);
                     if (bot.servers[event.d.guild_id].members[userID].roles.includes('585543893244837899')) {
-                        var flightNumbers = args.match(/(\-?\d{1,3}\d*\.?\d*\/){3,4}\-?\d{1,2}\d*\.?\d*/);
+                        var fnMatch = args.match(/(\-?\d{1,3}\d*\.?\d*\/){3,4}\-?\d{1,2}\d*\.?\d*/);
+                        var flightNumbers = fnMatch[0];
                         logger.info(flightNumbers);
                         var discName = args.toString().replace(flightNumbers, '');
                         logger.info(discName);
