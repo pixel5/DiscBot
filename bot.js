@@ -116,7 +116,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         logger.info(flightNumbers);
                         var discName = args.replace(flightNumbers, '');
                         logger.info(discName);
-                        flightNumbers = flightNumbers.split('/');
+                        flightNumbers = flightNumbers.toString().split('/');
                         bot.sendMessage({
                             to: channelID,
                             message: 'Disc Update',
