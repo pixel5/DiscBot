@@ -126,7 +126,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                 glide: flightNumbers[1],
                                 turn: flightNumbers[2],
                                 fade: flightNumbers[3],
-                                stability: (typeof flightNumbers[4] == "undefined") ? NULL : flightNumbers[4]
+                                stability: (typeof flightNumbers[4] == "undefined") ? null : flightNumbers[4]
                             },
                             json: true // Automatically stringifies the body to JSON
                         };
