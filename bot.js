@@ -71,7 +71,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 logger.info(args);
 				var replyText = [];
 				var options = {
-					uri: 'https://api.pixel5.us/discbot/disc/' + args.replace(",", "%20"),
+					uri: 'https://' + auth.pixel_api + '@api.pixel5.us/discbot/disc/' + args.replace(",", "%20"),
 					//qs: {
 					//	access_token: 'xxxxx xxxxx' // -> uri + '?access_token=xxxxx%20xxxxx'
 					//},
