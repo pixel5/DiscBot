@@ -159,6 +159,41 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         });
                     }
                 break;
+                case 'plastic':
+                    logger.info(args);
+    				var replyText = [];
+    				var options = {
+    					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/plastic/' + args.replace(",", "%20").trim(),
+    					//qs: {
+    					//	access_token: 'xxxxx xxxxx' // -> uri + '?access_token=xxxxx%20xxxxx'
+    					//},
+    					headers: {
+    						'User-Agent': 'Request-Promise'
+    					},
+    					json: true // Automatically parses the JSON string in the response
+    				};
+    				rp(options)
+    					.then(function (plastic) {
+    						for(var p in plastic) {
+    							if (plastic[p]) {
+    								replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + plastic[p])
+    							}
+    						}
+
+    						bot.sendMessage({
+    							to: channelID,
+    							message: '```' + replyText.join('\n') + '```'
+    						});
+    					})
+    					.catch(function (err) {
+    						// API call failed...
+    						bot.sendMessage({
+    							to: channelID,
+    							message: 'No plastic found by that name.'
+    						});
+    					}
+    				);
+                break;
                 // Just add any case commands if you want to..
              }
          }
