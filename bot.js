@@ -75,7 +75,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     logger.info(args);
     				var replyText = [];
     				var options = {
-    					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/disc/' + args.replace(",", "%20"),
+    					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/disc/' + args.replace(",", "%20").trim(),
     					//qs: {
     					//	access_token: 'xxxxx xxxxx' // -> uri + '?access_token=xxxxx%20xxxxx'
     					//},
@@ -115,10 +115,10 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         var fnMatch = args.match(/(\-?\d{1,3}\d*\.?\d*\/){3,4}\-?\d{1,2}\d*\.?\d*/);
                         var flightNumbers = fnMatch[0];
                         var discName = args.toString().replace(flightNumbers, '');
-
+logger.info(flightNumbers);
                         var options = {
                             method: 'GET',
-                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/discupdate/' + discName.replace(",", "%20") + flightNumbers,
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/discupdate/' + discName.replace(",", "%20").trim() + flightNumbers,
                             headers: {
         						'User-Agent': 'Request-Promise'
         					},
