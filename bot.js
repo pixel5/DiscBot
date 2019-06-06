@@ -146,7 +146,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     else {
                         bot.sendMessage({
                             to: channelID,
-                            message: 'You do not have permission to update discs.',
+                            message: 'Boost the server in order to update DiscBot data.',
                         });
                     }
                 break;
