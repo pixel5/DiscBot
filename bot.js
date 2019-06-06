@@ -114,11 +114,11 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     if (bot.servers[event.d.guild_id].members[userID].roles.includes('585543893244837899')) {
                         var fnMatch = args.match(/(\-?\d{1,3}\d*\.?\d*\/){3,4}\-?\d{1,2}\d*\.?\d*/);
                         var flightNumbers = fnMatch[0];
-                        var discName = args.toString().replace(flightNumbers, '');
+                        var discName = args.toString().replace(',' + flightNumbers, '');
 logger.info(flightNumbers);
                         var options = {
                             method: 'GET',
-                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/discupdate/' + discName.replace(",", "%20").trim() + flightNumbers,
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/discupdate/' + discName.replace(",", "%20").trim() + '/' + flightNumbers,
                             headers: {
         						'User-Agent': 'Request-Promise'
         					},
