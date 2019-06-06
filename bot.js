@@ -114,7 +114,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     if (bot.servers[event.d.guild_id].members[userID].roles.includes('585543893244837899')) {
                         var fnMatch = args.match(/(\-?\d{1,3}\d*\.?\d*\/){3,4}\-?\d{1,2}\d*\.?\d*/);
 
-                        if (!fnMatch[0]) {
+                        if (!fnMatch) {
                             bot.sendMessage({
                                 to: channelID,
                                 message: 'Invalid flight number format.',
