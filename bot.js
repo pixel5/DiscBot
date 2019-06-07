@@ -71,7 +71,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     var noMatch = false;
 
                     if (fnMatch) {
-                        var db_user_id = fnMatch[0].match(/[0-9]+/);logger.info (db_user_id);
+                        var db_user_id = fnMatch[0].match(/[0-9]+/);
                         var options = {
         					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/pdga/' + db_user_id,
         					headers: {
@@ -79,10 +79,10 @@ bot.on('message', function (user, userID, channelID, message, event) {
         					},
         					json: true // Automatically parses the JSON string in the response
         				};
-        				rp(options)
+        				pdga_id = rp(options)
         					.then(function (parsedBody) {
         						pdga_id = parsedBody.pdga_id;
-                                logger.info(pdga_id);
+                                return pdga_id;
         					})
         					.catch(function (err) {
         						// API call failed...
