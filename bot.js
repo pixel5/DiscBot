@@ -72,7 +72,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
                     if (args) {
                         fnMatch = args.match(/\<@[0-9]+\>/);
-                        logger.info(fnMatch);
+                        logger.info(args);
                     }
                     else {
                         db_user_id = userID;
