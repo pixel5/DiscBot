@@ -67,7 +67,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 break;
                 case 'pdga':
                     var fnMatch = args.match(/\<@[0-9]+\>/);
-                    var pdga_id = 1;
+                    pdga_id = 1;
                     var noMatch = false;
 
                     if (fnMatch) {
