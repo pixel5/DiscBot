@@ -67,7 +67,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 break;
                 case 'pdga':
                     var pdga_id = 1;
-                    var db_user_id = false;
+                    var db_user_id = 0;
                     var fnMatch = false;
 
                     if (args) {
@@ -79,7 +79,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     }
 
                     if (fnMatch) {
-                        if (!db_user_id) {
+                        if (db_user_id == 0) {
                             db_user_id = fnMatch[0].match(/[0-9]+/);
                         }
                         var options = {
