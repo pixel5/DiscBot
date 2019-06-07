@@ -81,6 +81,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
         				};
         				rp(options)
         					.then(function (parsedBody) {
+                                logger.info(parsedBody);
         						pdga_id = parsedBody.pdga_id;
         					})
         					.catch(function (err) {
