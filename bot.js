@@ -67,7 +67,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 break;
                 case 'pdga':
                     var fnMatch = args.match(/\<@[0-9]+\>/);
-                    pdga_id = 1;
+                    var pdga_id = 1;
                     var noMatch = false;
 
                     if (fnMatch) {
@@ -81,19 +81,21 @@ bot.on('message', function (user, userID, channelID, message, event) {
         				};
         				rp(options)
         					.then(function (parsedBody) {
-        						pdga_id = parsedBody.pdga_id;
-                                logger.info(pdga_id);
+        						fetchPdga(parsedBody.pdga_id);
         					})
         					.catch(function (err) {
         						// API call failed...
-        						noMatch = true;
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: 'User hasn\'t shared their PDGA number with me!'
+                                });
         					});
                     }
                     else {
-                        pdga_id = args;
+                        fetchPdga(args);
                     }
 
-                    if (!noMatch) {
+                    function fetchPdga(pdga_id) {
                         var url = 'https://www.pdga.com/player/' + pdga_id;
 
                         rp(url)
@@ -116,12 +118,6 @@ bot.on('message', function (user, userID, channelID, message, event) {
                           .catch(function(err){
                             //handle error
                             logger.info('An error occurred fetching information.');
-                          });
-                      }
-                      else {
-                          bot.sendMessage({
-                              to: channelID,
-                              message: 'User hasn\'t shared their PDGA number with me!'
                           });
                       }
                 break;
