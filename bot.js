@@ -44,9 +44,9 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     to: channelID,
                     message: '**DiscBot Commands**\n'
                         + '```\n'
-                        + '.disc <disc name>\n    Disc flight numbers\n'
-                        + '.discupdate <disc name> <speed>/<glide>/<turn>/<fade>[/stability]\n    Boosters only; Update disc flight numbers.'
-                        + '.plastic <plastic name>\n    Plastic characteristics\n'
+                        + '.disc <disc name>\n    Disc flight numbers\n\n'
+                        + '.discupdate <disc name> <speed>/<glide>/<turn>/<fade>[/stability]\n    Boosters only; Update disc flight numbers.\n\n'
+                        + '.plastic <plastic name>\n    Plastic characteristics\n\n'
                         + '.pdga <pdga number (without #)>\n    Summary from PDGA.com\n'
                         + '```'
                 });
