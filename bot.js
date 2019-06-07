@@ -71,7 +71,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     var noMatch = false;
 
                     if (fnMatch) {
-                        var db_user_id = fnMatch.match(/[0-9]+/);
+                        var db_user_id = fnMatch[0].match(/[0-9]+/);
                         var options = {
         					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/pdga/' + db_user_id,
         					headers: {
