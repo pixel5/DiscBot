@@ -92,7 +92,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     else {
                         pdga_id = args;
                     }
-
+                    logger.info(pdga_id);
                     if (!noMatch) {
                         var url = 'https://www.pdga.com/player/' + pdga_id;
 
