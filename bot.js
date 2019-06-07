@@ -20,7 +20,10 @@ bot.on('ready', function (event) {
     logger.info('Logged in as: ');
     logger.info(bot.username + ' - (' + bot.id + ')');
     bot.setPresence({
-    	game.name: '.dischelp',
+        game: {
+            name: '.dischelp',
+            type: 2
+          }
     });
 });
 bot.on('message', function (user, userID, channelID, message, event) {
