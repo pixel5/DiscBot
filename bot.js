@@ -19,6 +19,7 @@ bot.on('ready', function (event) {
     logger.info('Connected');
     logger.info('Logged in as: ');
     logger.info(bot.username + ' - (' + bot.id + ')');
+    bot.user.setGame('.dischelp')
 });
 bot.on('message', function (user, userID, channelID, message, event) {
     if (channelID in bot.directMessages) {
@@ -33,6 +34,18 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
             args = args.splice(1).toString();
             switch(cmd) {
+                case 'dischelp':
+                bot.sendMessage({
+                    to: channelID,
+                    message: '**DiscBot Commands**\n'
+                        + '```\n'
+                        + '.disc <disc name> | Disc flight numbers\n'
+                        + '.discupdate <disc name> <speed>/<glide>/<turn>/<fade>[/stability] | Boosters only; Update disc flight numbers.'
+                        + '.plastic <plastic name> | Plastic characteristics\n'
+                        + '.pdga <pdga number (without #)> | Summary from PDGA.com\n'
+                        + '```'
+                });
+                break;
                 // !ping
                 case 'ping':
                     bot.sendMessage({
