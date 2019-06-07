@@ -66,12 +66,22 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     });
                 break;
                 case 'pdga':
-                    var fnMatch = args.match(/\<@[0-9]+\>/);
                     var pdga_id = 1;
-                    var noMatch = false;
+                    var db_user_id = false;
+                    var fnMatch = false;
+
+                    if (args) {
+                        fnMatch = args.match(/\<@[0-9]+\>/);
+                    }
+                    else {
+                        db_user_id = userID;
+                        fnMatch = true;
+                    }
 
                     if (fnMatch) {
-                        var db_user_id = fnMatch[0].match(/[0-9]+/);
+                        if (!db_user_id) {
+                            db_user_id = fnMatch[0].match(/[0-9]+/);
+                        }
                         var options = {
         					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/pdga/' + db_user_id,
         					headers: {
