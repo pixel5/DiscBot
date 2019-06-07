@@ -82,6 +82,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
         				rp(options)
         					.then(function (parsedBody) {
         						pdga_id = parsedBody.pdga_id;
+                                logger.info(pdga_id);
         					})
         					.catch(function (err) {
         						// API call failed...
@@ -91,7 +92,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     else {
                         pdga_id = args;
                     }
-                    logger.info(pdga_id);
+
                     if (!noMatch) {
                         var url = 'https://www.pdga.com/player/' + pdga_id;
 
