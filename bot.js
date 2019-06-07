@@ -67,8 +67,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 break;
                 case 'pdga':
                     var fnMatch = args.match(/\<@[0-9]+\>/);
-                    var pdga_id = new Object;
-                    pdga_id.value = 1;
+                    var pdga_id = 1;
                     var noMatch = false;
 
                     if (fnMatch) {
@@ -82,19 +81,19 @@ bot.on('message', function (user, userID, channelID, message, event) {
         				};
         				rp(options)
         					.then(function (parsedBody) {
-        						pdga_id.value = parsedBody.pdga_id;
+        						var pdga_id = parsedBody.pdga_id;
         					})
         					.catch(function (err) {
         						// API call failed...
-        						noMatch = true;
+        						var noMatch = true;
         					});
                     }
                     else {
-                        pdga_id.value = args;
+                        var pdga_id = args;
                     }
                     logger.info(pdga_id);
                     if (!noMatch) {
-                        var url = 'https://www.pdga.com/player/' + pdga_id.value;
+                        var url = 'https://www.pdga.com/player/' + pdga_id;
 
                         rp(url)
                           .then(function(html){
