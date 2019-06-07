@@ -47,7 +47,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         + '.disc <disc name>\n    Disc flight numbers\n\n'
                         + '.discupdate <disc name> <speed>/<glide>/<turn>/<fade>[/stability]\n    Boosters only; Update disc flight numbers\n\n'
                         + '.plastic <plastic name>\n    Plastic characteristics\n\n'
-                        + '.pdga <pdga number (without #)>\n    Summary from PDGA.com\n'
+                        + '.pdga <pdga number (without #)>\n    Summary from PDGA.com\n\n'
                         + '.mypdga <pdga number (without #)>\n    Save your PDGA number\n'
                         + '```'
                 });
