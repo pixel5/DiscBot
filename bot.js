@@ -19,7 +19,7 @@ bot.on('ready', function (event) {
     logger.info('Connected');
     logger.info('Logged in as: ');
     logger.info(bot.username + ' - (' + bot.id + ')');
-    bot.user.setGame('.dischelp')
+    bot.user.setActivity('.dischelp', {type: 'PLAYING'})
 });
 bot.on('message', function (user, userID, channelID, message, event) {
     if (channelID in bot.directMessages) {
