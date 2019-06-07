@@ -45,9 +45,10 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     message: '**DiscBot Commands**\n'
                         + '```\n'
                         + '.disc <disc name>\n    Disc flight numbers\n\n'
-                        + '.discupdate <disc name> <speed>/<glide>/<turn>/<fade>[/stability]\n    Boosters only; Update disc flight numbers.\n\n'
+                        + '.discupdate <disc name> <speed>/<glide>/<turn>/<fade>[/stability]\n    Boosters only; Update disc flight numbers\n\n'
                         + '.plastic <plastic name>\n    Plastic characteristics\n\n'
                         + '.pdga <pdga number (without #)>\n    Summary from PDGA.com\n'
+                        + '.mypdga <pdga number (without #)>\n    Save your PDGA number\n'
                         + '```'
                 });
                 break;
@@ -243,7 +244,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 // Just add any case commands if you want to..
              }
          }
-         else if (message.includes('<@585833915957379101> sucks') || message.includes('failed bot') || message.includes('bad bot')) {
+         else if (message.toLowerCase().includes('<@585833915957379101> sucks') || message.toLowerCase().includes('failed bot') || message.toLowerCase().includes('bad bot')) {
              bot.sendMessage({
                  to: channelID,
                  message: 'Here\'s an idea, <@' + userID + '>, how about you stop throwing nose-up.'
