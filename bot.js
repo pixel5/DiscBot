@@ -72,6 +72,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
                     if (args) {
                         fnMatch = args.match(/\<@[0-9]+\>/);
+                        logger.info(fnMatch);
                     }
                     else {
                         db_user_id = userID;
@@ -81,6 +82,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     if (fnMatch) {
                         if (db_user_id == 0) {
                             db_user_id = fnMatch[0].match(/[0-9]+/);
+                            logger.info(db_user_id);
                         }
                         var options = {
         					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/pdga/' + db_user_id,
@@ -91,7 +93,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
         				};
         				rp(options)
         					.then(function (parsedBody) {
-                                logger.info(parsedBody.pdga_id);
+
         						fetchPdga(parsedBody.pdga_id);
         					})
         					.catch(function (err) {
