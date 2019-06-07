@@ -212,6 +212,34 @@ bot.on('message', function (user, userID, channelID, message, event) {
     					}
     				);
                 break;
+                case 'mypdga':
+                    var options = {
+                        method: 'GET',
+                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/mypdga/' + userID + '/' + args.replace(",", "%20").trim(),
+                        headers: {
+                            'User-Agent': 'Request-Promise'
+                        },
+                        json: true // Automatically stringifies the body to JSON
+                    };
+
+                    rp(options)
+                        .then(function (parsedBody) {
+                            logger.info(parsedBody);
+                            // POST succeeded...
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'Your PDGA number has been saved.',
+                            });
+                        })
+                        .catch(function (err) {
+                            logger.info(err);
+                            // POST failed...
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'Could not update your PDGA number. What did you do?',
+                            });
+                    });
+                break;
                 // Just add any case commands if you want to..
              }
          }
