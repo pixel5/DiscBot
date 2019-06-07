@@ -66,29 +66,63 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     });
                 break;
                 case 'pdga':
-                    var url = 'https://www.pdga.com/player/' + args;
+                    var fnMatch = args.match(/\<@[0-9]+\>/);
+                    var pdga_id = 1;
+                    var noMatch = false;
 
-                    rp(url)
-                      .then(function(html){
-                        //success!
-                        var messageList = [];
-                        // Name
-                        messageList.push(cheerio('.pane-page-title > .pane-content', html).text());
+                    if (fnMatch) {
+                        var db_user_id = fnMatch.match(/[0-9]+/);
+                        var options = {
+        					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/pdga/' + db_user_id,
+        					headers: {
+        						'User-Agent': 'Request-Promise'
+        					},
+        					json: true // Automatically parses the JSON string in the response
+        				};
+        				rp(options)
+        					.then(function (parsedBody) {
+        						pdga_id = parsedBody.pdga_id;
+        					})
+        					.catch(function (err) {
+        						// API call failed...
+        						noMatch = true;
+        					});
+                    }
+                    else {
+                        pdga_id = args;
+                    }
 
-                        // Details
-                        cheerio('ul.player-info > li', html).each(function(index, element) {
-                            messageList.push(cheerio(this).text());
-                        });
+                    if (!noMatch) {
+                        var url = 'https://www.pdga.com/player/' + pdga_id;
 
-                        bot.sendMessage({
-                            to: channelID,
-                            message: '```' + messageList.join('\n') + '```' + url
-                        });
-                      })
-                      .catch(function(err){
-                        //handle error
-                        logger.info('An error occurred fetching information.');
-                      });
+                        rp(url)
+                          .then(function(html){
+                            //success!
+                            var messageList = [];
+                            // Name
+                            messageList.push(cheerio('.pane-page-title > .pane-content', html).text());
+
+                            // Details
+                            cheerio('ul.player-info > li', html).each(function(index, element) {
+                                messageList.push(cheerio(this).text());
+                            });
+
+                            bot.sendMessage({
+                                to: channelID,
+                                message: '```' + messageList.join('\n') + '```' + url
+                            });
+                          })
+                          .catch(function(err){
+                            //handle error
+                            logger.info('An error occurred fetching information.');
+                          });
+                      }
+                      else {
+                          bot.sendMessage({
+                              to: channelID,
+                              message: 'User hasn\'t shared their PDGA number with me!'
+                          });
+                      }
                 break;
                 case 'disc':
                     logger.info(args);
@@ -125,8 +159,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
     							to: channelID,
     							message: 'No disc found by that name.'
     						});
-    					}
-    				);
+    					});
                 break;
                 case 'discupdate':
                     //logger.info(message.author.id);
