@@ -40,31 +40,29 @@ bot.on('message', function (user, userID, channelID, message, event) {
             args = args.splice(1).toString();
             switch(cmd) {
                 case 'dischelp':
-                bot.sendMessage({
-                    to: channelID,
-                    message: '**DiscBot Commands**\n'
-                        + '```\n'
-                        + '.disc <disc name>\n    Disc flight numbers\n\n'
-                        + '.discupdate <disc name> <speed>/<glide>/<turn>/<fade>[/stability]\n    Boosters only; Update disc flight numbers\n\n'
-                        + '.plastic <plastic name>\n    Plastic characteristics\n\n'
-                        + '.pdga <pdga number (without #)>\n    Summary from PDGA.com\n\n'
-                        + '.mypdga <pdga number (without #)>\n    Save your PDGA number\n'
-                        + '```'
-                });
-                break;
-                // !ping
-                case 'ping':
                     bot.sendMessage({
                         to: channelID,
-                        message: 'Pong!'
+                        message: '**DiscBot Commands**\n'
+                            + '```\n'
+                            + '.disc <disc name>\n    Disc flight numbers\n\n'
+                            + '.discupdate <disc name> <speed>/<glide>/<turn>/<fade>[/stability]\n    Boosters only; Update disc flight numbers\n\n'
+                            + '.plastic <plastic name>\n    Plastic characteristics\n\n'
+                            + '.pdga [pdga number (without #)]|[@user]\n    Summary from PDGA.com\n\n'
+                            + '.mypdga <pdga number (without #)>\n    Save your PDGA number\n\n'
+                            + '.ibag <disc name>[, <disc 2>, <disc 3>, etc.]\n    Tell DiscBot what frisbees you carry\n\n'
+                            + '.whobags <disc name>\n    Find out who carries a certain disc\n\n'
+                            + '.bag [@user]\n    See what @user is carrying, or just \'.bag\' to see your own\n'
+                            + '```'
                     });
                 break;
+                
                 case 'disc-doesnt-hit-trees':
                     bot.sendMessage({
                         to: channelID,
                         message: '<:DGGIT:585849585323343892> <:DGGUD:585849585176412182>'
                     });
                 break;
+                
                 case 'pdga':
                     var pdga_id = 1;
                     var db_user_id = 0;
@@ -132,6 +130,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                           });
                       }
                 break;
+                
                 case 'disc':
                     logger.info(args);
     				var replyText = [];
@@ -169,6 +168,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
     						});
     					});
                 break;
+                
                 case 'discupdate':
                     //logger.info(message.author.id);
                     if (bot.servers[event.d.guild_id].members[userID].roles.includes('585543893244837899')) {
@@ -219,6 +219,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         });
                     }
                 break;
+                
                 case 'plastic':
                     logger.info(args);
     				var replyText = [];
@@ -254,6 +255,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
     					}
     				);
                 break;
+                
                 case 'mypdga':
                     var options = {
                         method: 'GET',
@@ -282,7 +284,131 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             });
                     });
                 break;
-                // Just add any case commands if you want to..
+                
+                case 'ibag':
+                    var replyText = [];
+                    var addedDiscs = [];
+                    var removedDiscs = [];
+                    var failedDiscs = [];
+                    var discNames = message.replace('.ibag ', '');
+
+                    var options = {
+                        method: 'GET',
+                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/ibag/' + userID + '/' + discNames,
+                        headers: {
+                            'User-Agent': 'Request-Promise'
+                        },
+                        json: true // Automatically stringifies the body to JSON
+                    };
+                    
+                    rp(options)
+                        .then(function (parsedBody) {
+                            if (parsedBody.hasOwnProperty('added')) {
+                                addedDiscs.push(parsedBody.added);
+                            }
+                            if (parsedBody.hasOwnProperty('removed')) {
+                                removedDiscs.push(parsedBody.removed);
+                            }
+                            if (parsedBody.hasOwnProperty('failed')) {
+                                failedDiscs.push(parsedBody.failed);
+                            }
+
+                            ibagReply(addedDiscs, removedDiscs, failedDiscs);
+                        })
+                        .catch(function (err) {
+                            logger.info('An error occurred with ibag command.');
+                    });
+                
+                    function ibagReply(addedDiscs, removedDiscs, failedDiscs) {
+                        if (addedDiscs.length != 0) {
+                           replyText.push('Added: ' + addedDiscs.join(', '));
+                        }
+                        if (removedDiscs.length != 0) {
+                           replyText.push('Removed: ' + removedDiscs.join(', '));
+                        }
+                        if (failedDiscs[0]) {logger.info(failedDiscs);
+                           replyText.push('Error (may not exist): ' + failedDiscs.join(', '));
+                        }
+                        logger.info(replyText.join('\n'));
+                        bot.sendMessage({
+                            to: channelID,
+                            message: replyText.join('\n'),
+                        });
+                    }
+                break;
+                
+                case 'whobags':
+                    var throwers = [];
+                    var discName = message.replace('.whobags ', '');
+                    var options = {
+                        method: 'GET',
+                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/throwers/' + discName.trim(),
+                        headers: {
+                            'User-Agent': 'Request-Promise'
+                        },
+                        json: true // Automatically stringifies the body to JSON
+                    };
+
+                    rp(options)
+                        .then(function (parsedBody) {
+                            for (throwerID of parsedBody.users) {
+                                throwers.push(bot.users[throwerID].username);
+                            }
+                            
+                            bot.sendMessage({
+                                to: channelID,
+                                message: discName.charAt(0).toUpperCase() + discName.slice(1) + ' gang:\n' + throwers.join(', '),
+                            });
+                        })
+                        .catch(function (err) {
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'No one here bags that disc!',
+                            });
+                    });
+                 break;
+                 
+                 case 'bag':
+                    var pdga_id = 1;
+                    var db_user_id = 0;
+                    var fnMatch = false;
+
+                    if (args) {
+                        fnMatch = args.match(/\<@!?[0-9]+\>/);
+                    }
+                    else {
+                        db_user_id = userID;
+                        fnMatch = true;
+                    }
+
+                    if (fnMatch) {
+                        if (db_user_id == 0) {
+                            db_user_id = fnMatch[0].match(/[0-9]+/);
+                        }
+                        
+                        var options = {
+                            method: 'GET',
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/bag/' + db_user_id,
+                            headers: {
+                                'User-Agent': 'Request-Promise'
+                            },
+                            json: true // Automatically stringifies the body to JSON
+                        };
+
+                        rp(options)
+                            .then(function (parsedBody) {                               
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: 'In ' + bot.users[db_user_id].username + '\'s bag:\n' + parsedBody.discs.join(', '),
+                                });
+                            })
+                            .catch(function (err) {
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: 'Player bag not found.',
+                                });
+                        });
+                    }
              }
          }
          else if (message.toLowerCase().includes('<@585833915957379101> sucks') || message.toLowerCase().includes('failed bot') || message.toLowerCase().includes('bad bot')) {
