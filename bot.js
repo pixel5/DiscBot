@@ -571,15 +571,13 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             for (top10Mold of parsedBody.top) {
                                 top10Discs.push(top10Mold.name + ' (' + top10Mold.count + ')')
                             }
-
                             embedFields.push({name: 'Top 10 Molds', value: top10Discs.join(', ')});
-                            logger.info(bot.users[parsedBody.most_molds.user_id].username);
-                            logger.info(parsedBody.most_molds.count);
+
                             // Most molds
-                            embedFields.push({name: 'Disc Collector', value: bot.users[parsedBody.most_molds.user_id].username + ' carries the most molds with ' + parsedBody.most_molds.count});
+                            embedFields.push({name: 'Disc Collector', value: bot.users[parsedBody.most_molds[user_id]].username + ' carries the most molds with ' + parsedBody.most_molds[count]});
 
                             // Fewest molds
-                            embedFields.push({name: 'Philo Fanclub', value: bot.users[parsedBody.fewest_molds.user_id].username + ' carries the fewest molds with ' + parsedBody.fewest_molds.count});
+                            embedFields.push({name: 'Philo Fanclub', value: bot.users[parsedBody.fewest_molds[user_id]].username + ' carries the fewest molds with ' + parsedBody.fewest_molds[count]});
 
                             bot.sendMessage({
                                 to: channelID,
