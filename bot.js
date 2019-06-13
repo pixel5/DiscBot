@@ -34,6 +34,9 @@ bot.on('ready', function (event) {
 bot.on('message', function (user, userID, channelID, message, event) {
     if (channelID in bot.directMessages && message.substring(0,9) != '.dischelp') {
         // Direct Message handling
+        logger.info(userID);
+        logger.info(ownerUserID);
+
         if (userID == ownerUserID) {
             var args = message.substring(1).split(' ');
             var cmd = args[0];
