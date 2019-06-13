@@ -524,7 +524,6 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
                         rp(options)
                             .then(function (parsedBody) {
-                                logger.info(parsedBody);
                                 // POST succeeded...
                                 bot.sendMessage({
                                     to: channelID,
@@ -538,7 +537,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                     to: channelID,
                                     message: 'Could not update your bag photo. What did you do?',
                                 });
-                        });
+                            });
                     }
                     else {
                         bot.sendMessage({
@@ -546,6 +545,45 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             message: 'Invalid photo URL. Must end in .jpg, .png, etc...',
                         });
                     }
+                break;
+
+                case 'bagstats':
+                    var embedFields = [];
+
+                    var options = {
+                        method: 'GET',
+                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/bagstats',
+                        headers: {
+                            'User-Agent': 'Request-Promise'
+                        },
+                        json: true // Automatically stringifies the body to JSON
+                    };
+
+                    rp(options)
+                        .then(function (parsedBody) {
+                            // POST succeeded...
+                            embedFields.push({name: 'Total number of bags: ', value: parsedBody.bag_count)});
+
+                            var top10Discs = [];
+                            for (top10Mold of parsedBody.top) {
+                                top10Discs.push(top10Mold.name + ' (' + top10Mold.count + ')')
+                            }
+
+                            embedFields.push({name: 'Top 10 Molds', value: top10Discs.join(', ')});
+
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'Bag photo updated.',
+                            });
+                        })
+                        .catch(function (err) {
+                            logger.info(err);
+                            // POST failed...
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'Bag stats could not be retrieved at this time.',
+                            });
+                        });
                 break;
              }
          }
