@@ -9,12 +9,14 @@ logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console, {
     colorize: true
 });
+
 logger.level = 'debug';
 // Initialize Discord Bot
 var bot = new Discord.Client({
    token: auth.token,
    autorun: true
 });
+
 bot.on('ready', function (event) {
     logger.info('Connected');
     logger.info('Logged in as: ');
@@ -25,7 +27,13 @@ bot.on('ready', function (event) {
             type: 2
           }
     });
+    bot.editNickname({
+    	serverID: 367736108525682700,
+    	userID: 585833915957379101,
+    	nick: 'DiscBot',
+    });
 });
+
 bot.on('message', function (user, userID, channelID, message, event) {
     if (channelID in bot.directMessages && message.substring(0,9) != '.dischelp') {
         // Direct Message handling
@@ -57,14 +65,14 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             + '```'
                     });
                 break;
-                
+
                 case 'disc-doesnt-hit-trees':
                     bot.sendMessage({
                         to: channelID,
                         message: '<:DGGIT:585849585323343892> <:DGGUD:585849585176412182>'
                     });
                 break;
-                
+
                 case 'pdga':
                     var pdga_id = 1;
                     var db_user_id = 0;
@@ -132,7 +140,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                           });
                       }
                 break;
-                
+
                 case 'disc':
                     logger.info(args);
     				var replyText = [];
@@ -170,7 +178,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
     						});
     					});
                 break;
-                
+
                 case 'discupdate':
                     //logger.info(message.author.id);
                     if (bot.servers[event.d.guild_id].members[userID].roles.includes('585543893244837899')) {
@@ -221,7 +229,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         });
                     }
                 break;
-                
+
                 case 'plastic':
                     logger.info(args);
     				var replyText = [];
@@ -257,7 +265,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
     					}
     				);
                 break;
-                
+
                 case 'mypdga':
                     var options = {
                         method: 'GET',
@@ -286,7 +294,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             });
                     });
                 break;
-                
+
                 case 'ibag':
                     var replyText = [];
                     var addedDiscs = [];
@@ -302,7 +310,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         },
                         json: true // Automatically stringifies the body to JSON
                     };
-                    
+
                     rp(options)
                         .then(function (parsedBody) {
                             if (parsedBody.hasOwnProperty('added')) {
@@ -320,7 +328,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         .catch(function (err) {
                             logger.info('An error occurred with ibag command.');
                     });
-                
+
                     function ibagReply(addedDiscs, removedDiscs, failedDiscs) {
                         if (addedDiscs.length != 0) {
                            replyText.push('Added: ' + addedDiscs.join(', '));
@@ -338,7 +346,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         });
                     }
                 break;
-                
+
                 case 'whobags':
                     var throwers = [];
                     var discName = message.replace('.whobags ', '');
@@ -356,7 +364,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             for (throwerID of parsedBody.users) {
                                 throwers.push(bot.users[throwerID].username);
                             }
-                            
+
                             bot.sendMessage({
                                 to: channelID,
                                 message: discName.charAt(0).toUpperCase() + discName.slice(1) + ' gang:\n' + throwers.join(', '),
@@ -369,7 +377,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             });
                     });
                  break;
-                 
+
                  case 'bag':
                     var pdga_id = 1;
                     var db_user_id = 0;
@@ -391,7 +399,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         if (db_user_id == 0) {
                             db_user_id = fnMatch[0].match(/[0-9]+/);
                         }
-                        
+
                         var options = {
                             method: 'GET',
                             uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/bagsorted/' + db_user_id,
@@ -400,7 +408,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             },
                             json: true // Automatically stringifies the body to JSON
                         };
-                        
+
                         rp(options)
                             .then(function (parsedBody) {
                                 for (discCategory in parsedBody.discs) {
@@ -408,7 +416,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                     moldCount += parsedBody.discs[discCategory].length;
                                     embedFields.push({name: discCategory, value: parsedBody.discs[discCategory].join(', ')});
                                 }
-                                
+
                                 // Bag Nickname
                                 if (parsedBody.bag_nick) {
                                     bagNick = '"' + parsedBody.bag_nick + '" ';
@@ -436,7 +444,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                             text: bot.users[db_user_id].username + ' carries ' + moldCount + ' different molds, mostly '
                                                 + parsedBody.mfr_pref + ' discs.'
                                         }
-                                    }                                    
+                                    }
                                 });
                             })
                             .catch(function (err) {
@@ -447,7 +455,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         });
                     }
                 break;
-                
+
                 case 'bagname':
                     var bagName = message.replace('.bagname ', '').substring(0,45).replace('?', '%3F');
                     var options = {
@@ -477,17 +485,17 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             });
                     });
                 break;
-                
+
                 case 'bagphoto':
                     var photoUrl = '';
                     var fnMatch = null;
                     if (args) {
                         fnMatch = message.match(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/);
                     }
-                    
+
                     if (fnMatch) {
                         photoUrl = fnMatch[0];
-                    
+
                         var options = {
                             method: 'GET',
                             uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/bagphoto/' + userID + '?photoUrl=' + encodeURIComponent(photoUrl),
