@@ -573,7 +573,8 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             }
 
                             embedFields.push({name: 'Top 10 Molds', value: top10Discs.join(', ')});
-
+                            logger.info(bot.users[parsedBody.most_molds.user_id].username);
+                            logger.info(parsedBody.most_molds.count);
                             // Most molds
                             embedFields.push({name: 'Disc Collector', value: bot.users[parsedBody.most_molds.user_id].username + ' carries the most molds with ' + parsedBody.most_molds.count});
 
