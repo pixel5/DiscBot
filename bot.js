@@ -578,7 +578,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             embedFields.push({name: 'Disc Collector', value: bot.users[parsedBody.most_molds.user_id].username + ' carries the most molds with ' . parsedBody.most_molds.count});
 
                             // Fewest molds
-                            embedFields.push({name: 'Philo Fan-club', value: bot.users[parsedBody.fewest_molds.user_id].username + ' carries the fewest molds with ' . parsedBody.fewest_molds.count});
+                            embedFields.push({name: 'Philo Fanclub', value: bot.users[parsedBody.fewest_molds.user_id].username + ' carries the fewest molds with ' . parsedBody.fewest_molds.count});
 
                             bot.sendMessage({
                                 to: channelID,
