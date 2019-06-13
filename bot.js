@@ -562,14 +562,23 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     rp(options)
                         .then(function (parsedBody) {
                             // POST succeeded...
+
+                            // Total bags
                             embedFields.push({name: 'Total number of bags: ', value: parsedBody.bag_count});
 
+                            // top 10 molds
                             var top10Discs = [];
                             for (top10Mold of parsedBody.top) {
                                 top10Discs.push(top10Mold.name + ' (' + top10Mold.count + ')')
                             }
 
                             embedFields.push({name: 'Top 10 Molds', value: top10Discs.join(', ')});
+
+                            // Most molds
+                            embedFields.push({name: 'Disc Collector', value: bot.users[parsedBody.most_molds.user_id].username + ' carries the most molds with ' . parsedBody.most_molds.count});
+
+                            // Fewest molds
+                            embedFields.push({name: 'Philo Fan-club', value: bot.users[parsedBody.fewest_molds.user_id].username + ' carries the fewest molds with ' . parsedBody.fewest_molds.count});
 
                             bot.sendMessage({
                                 to: channelID,
