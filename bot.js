@@ -4,7 +4,7 @@ var auth = require('./auth.json');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 
-var ownerUserID = '138098206587355137';
+var ownerUserID = 138098206587355137;
 
 // Configure logger settings
 logger.remove(logger.transports.Console);
