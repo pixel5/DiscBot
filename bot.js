@@ -27,7 +27,7 @@ bot.on('ready', function (event) {
     });
 });
 bot.on('message', function (user, userID, channelID, message, event) {
-    if (channelID in bot.directMessages) {
+    if (channelID in bot.directMessages && message.substring(0,9) != '.dischelp') {
         // Direct Message handling
     }
     else {
@@ -41,7 +41,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
             switch(cmd) {
                 case 'dischelp':
                     bot.sendMessage({
-                        to: channelID,
+                        to: userID,
                         message: '**DiscBot Commands**\n'
                             + '```\n'
                             + '.disc <disc name>\n    Disc flight numbers\n\n'
@@ -52,6 +52,8 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             + '.ibag <disc name>[, <disc 2>, <disc 3>, etc.]\n    Tell DiscBot what frisbees you carry\n\n'
                             + '.whobags <disc name>\n    Find out who carries a certain disc\n\n'
                             + '.bag [@user]\n    See what @user is carrying, or just \'.bag\' to see your own\n'
+                            + '.bagname <name>\n    Write what bag you are carrying or just give your bag a cool name.\n\n'
+                            + '.bagphoto <photu URL>\n    A photo of your bag. Must be an image url (ends in .jpg, .png, etc)\n\n'
                             + '```'
                     });
                 break;
@@ -372,6 +374,10 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     var pdga_id = 1;
                     var db_user_id = 0;
                     var fnMatch = false;
+                    var embedFields = [];
+                    var moldCount = 0;
+                    var bagNick = '';
+                    var bagPhoto = '';
 
                     if (args) {
                         fnMatch = args.match(/\<@!?[0-9]+\>/);
@@ -388,7 +394,103 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         
                         var options = {
                             method: 'GET',
-                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/bag/' + db_user_id,
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/bagsorted/' + db_user_id,
+                            headers: {
+                                'User-Agent': 'Request-Promise'
+                            },
+                            json: true // Automatically stringifies the body to JSON
+                        };
+                        
+                        rp(options)
+                            .then(function (parsedBody) {
+                                for (discCategory in parsedBody.discs) {
+                                    //replyText.push('**' + discCategory + '**: ' + parsedBody.discs[discCategory].join(', '));
+                                    moldCount += parsedBody.discs[discCategory].length;
+                                    embedFields.push({name: discCategory, value: parsedBody.discs[discCategory].join(', ')});
+                                }
+                                
+                                // Bag Nickname
+                                if (parsedBody.bag_nick) {
+                                    bagNick = '"' + parsedBody.bag_nick + '" ';
+                                }
+                                // Bag photo
+                                if (parsedBody.bag_photo) {
+                                    bagPhoto = parsedBody.bag_photo;
+                                }
+
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: '',
+                                    embed: {
+                                        color: 3447003,
+                                        author: {
+                                            name: bot.users[db_user_id].username + '\'s ' + bagNick + 'bag',
+                                            icon_url: bot.users[db_user_id].avatarURL
+                                        },
+                                        thumbnail: {
+                                          url: bagPhoto
+                                        },
+                                        fields: embedFields,
+                                        footer: {
+                                            icon_url: bot.users[db_user_id].avatarURL,
+                                            text: bot.users[db_user_id].username + ' carries ' + moldCount + ' different molds, mostly '
+                                                + parsedBody.mfr_pref + ' discs.'
+                                        }
+                                    }                                    
+                                });
+                            })
+                            .catch(function (err) {
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: 'Player bag not found.'
+                                });
+                        });
+                    }
+                break;
+                
+                case 'bagname':
+                    var bagName = message.replace('.bagname ', '').substring(0,45).replace('?', '%3F');
+                    var options = {
+                        method: 'GET',
+                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/bagnick/' + userID + '/' + bagName,
+                        headers: {
+                            'User-Agent': 'Request-Promise'
+                        },
+                        json: true // Automatically stringifies the body to JSON
+                    };
+
+                    rp(options)
+                        .then(function (parsedBody) {
+                            logger.info(parsedBody);
+                            // POST succeeded...
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'Bag nick name updated.',
+                            });
+                        })
+                        .catch(function (err) {
+                            logger.info(err);
+                            // POST failed...
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'Could not update your bag. What did you do?',
+                            });
+                    });
+                break;
+                
+                case 'bagphoto':
+                    var photoUrl = '';
+                    var fnMatch = null;
+                    if (args) {
+                        fnMatch = message.match(/(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/);
+                    }
+                    
+                    if (fnMatch) {
+                        photoUrl = fnMatch[0];
+                    
+                        var options = {
+                            method: 'GET',
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/bagphoto/' + userID + '?photoUrl=' + encodeURIComponent(photoUrl),
                             headers: {
                                 'User-Agent': 'Request-Promise'
                             },
@@ -396,19 +498,30 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         };
 
                         rp(options)
-                            .then(function (parsedBody) {                               
+                            .then(function (parsedBody) {
+                                logger.info(parsedBody);
+                                // POST succeeded...
                                 bot.sendMessage({
                                     to: channelID,
-                                    message: 'In ' + bot.users[db_user_id].username + '\'s bag:\n' + parsedBody.discs.join(', '),
+                                    message: 'Bag photo updated.',
                                 });
                             })
                             .catch(function (err) {
+                                logger.info(err);
+                                // POST failed...
                                 bot.sendMessage({
                                     to: channelID,
-                                    message: 'Player bag not found.',
+                                    message: 'Could not update your bag photo. What did you do?',
                                 });
                         });
                     }
+                    else {
+                        bot.sendMessage({
+                            to: channelID,
+                            message: 'Invalid photo URL. Must end in .jpg, .png, etc...',
+                        });
+                    }
+                break;
              }
          }
          else if (message.toLowerCase().includes('<@585833915957379101> sucks') || message.toLowerCase().includes('failed bot') || message.toLowerCase().includes('bad bot')) {
