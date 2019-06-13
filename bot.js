@@ -44,7 +44,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
             args = args.splice(1).toString();
             switch(cmd) {
                 case 'botnick':
-                    var botNick = message.replace('.botnick', '');
+                    var botNick = message.replace('.botnick', '').trim();
                     logger.info('Bot nick name change to: ' + botNick)
                     bot.editNickname({
                         serverID: '367736108525682700',
