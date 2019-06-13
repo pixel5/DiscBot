@@ -573,7 +573,12 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
                             bot.sendMessage({
                                 to: channelID,
-                                message: 'Bag photo updated.',
+                                message: '',
+                                embed: {
+                                    color: 3447003,
+                                    title: 'Discord Bag Stats',
+                                    fields: embedFields
+                                }
                             });
                         })
                         .catch(function (err) {
