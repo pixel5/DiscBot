@@ -562,7 +562,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     rp(options)
                         .then(function (parsedBody) {
                             // POST succeeded...
-                            embedFields.push({name: 'Total number of bags: ', value: parsedBody.bag_count)});
+                            embedFields.push({name: 'Total number of bags: ', value: parsedBody.bag_count});
 
                             var top10Discs = [];
                             for (top10Mold of parsedBody.top) {
