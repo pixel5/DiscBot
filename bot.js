@@ -28,8 +28,8 @@ bot.on('ready', function (event) {
           }
     });
     bot.editNickname({
-    	serverID: 367736108525682700,
-    	userID: 585833915957379101,
+    	serverID: '367736108525682700',
+    	userID: '585833915957379101',
     	nick: 'DiscBot',
     });
 });
