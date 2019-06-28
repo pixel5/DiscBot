@@ -1,6 +1,7 @@
 var Discord = require('discord.io');
 var logger = require('winston');
 var auth = require('./auth.json');
+const fs = require('fs');
 const rp = require('request-promise');
 const cheerio = require('cheerio');
 
@@ -66,20 +67,51 @@ bot.on('message', function (user, userID, channelID, message, event) {
             switch(cmd) {
                 case 'dischelp':
                     bot.sendMessage({
-                        to: userID,
-                        message: '**DiscBot Commands**\n'
-                            + '```\n'
-                            + '.disc <disc name>\n    Disc flight numbers\n\n'
-                            + '.discupdate <disc name> <speed>/<glide>/<turn>/<fade>[/stability]\n    Boosters only; Update disc flight numbers\n\n'
-                            + '.plastic <plastic name>\n    Plastic characteristics\n\n'
-                            + '.pdga [pdga number (without #)]|[@user]\n    Summary from PDGA.com\n\n'
-                            + '.mypdga <pdga number (without #)>\n    Save your PDGA number\n\n'
-                            + '.ibag <disc name>[, <disc 2>, <disc 3>, etc.]\n    Tell DiscBot what frisbees you carry\n\n'
-                            + '.whobags <disc name>\n    Find out who carries a certain disc\n\n'
-                            + '.bag [@user]\n    See what @user is carrying, or just \'.bag\' to see your own\n'
-                            + '.bagname <name>\n    Write what bag you are carrying or just give your bag a cool name.\n\n'
-                            + '.bagphoto <photu URL>\n    A photo of your bag. Must be an image url (ends in .jpg, .png, etc)\n\n'
-                            + '```'
+                        to: channelID,
+                        message: '',
+                        embed: {
+                            color: 3447003,
+                            thumbnail: {
+                              url: bagPhoto
+                            },
+                            fields: [{
+                                name: "How to git gud at DiscBot",
+                                value: "https://app.pixel5.us/discbot/commands"
+                            }]
+                        }                        
+                    });
+                break;
+                
+                case 'discbot':
+                    bot.sendMessage({
+                        to: channelID,
+                        message: '',
+                        embed: {
+                            color: 3447003,
+                            thumbnail: {
+                              url: bagPhoto
+                            },
+                            fields: [{
+                                name: "View the DiscBot project on GitHub",
+                                value: "https://pixel5.github.io/DiscBot/"
+                            }]
+                        }                        
+                    });
+                break;
+                
+                case 'gstar':
+                    var gstar;
+                    // First I want to read the file
+                    fs.readFile('./gstar.txt', function read(err, data) {
+                        if (err) {
+                            logger.info(err);
+                        }
+                        gstar = data;
+                        
+                        bot.sendMessage({
+                            to: channelID,
+                            message: '```' + gstar + '```'
+                        });
                     });
                 break;
 
@@ -159,10 +191,10 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 break;
 
                 case 'disc':
-                    logger.info(args);
-    				var replyText = [];
+                    logger.info(message);
+                    var embedFields = [];
     				var options = {
-    					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/disc/' + args.replace(",", "%20").trim(),
+    					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/disc/' + message.replace('.disc ', '').trim(),
     					//qs: {
     					//	access_token: 'xxxxx xxxxx' // -> uri + '?access_token=xxxxx%20xxxxx'
     					//},
@@ -173,18 +205,83 @@ bot.on('message', function (user, userID, channelID, message, event) {
     				};
     				rp(options)
     					.then(function (disc) {
-    						var pdgaName = disc.pdga_name;
-    						delete disc.id;
-    						delete disc.pdga_name;
-    						for(var p in disc) {
-    							if (disc[p]) {
-    								replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + disc[p])
-    							}
+    						for(var discId in disc) {
+                                var replyText = [];
+                                
+                                var discName = disc[discId].name;
+                                var pdgaName = disc[discId].pdga_name;
+                                delete disc[discId].id;
+                                delete disc[discId].pdga_name;
+                                delete disc[discId].name;
+                                
+                                for (var p in disc[discId]) {
+                                    if (disc[discId][p]) {
+                                        replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + disc[discId][p].replace('&#176;', ''))
+                                    }
+                                }
+                                
+                                embedFields.push({name: discName, value: replyText.join('\n'), inline: true});
     						}
 
     						bot.sendMessage({
     							to: channelID,
-    							message: '```' + replyText.join('\n') + '```'
+    							message: '',
+                                    embed: {
+                                    color: 3447003,
+                                    fields: embedFields
+                                }
+    						});
+    					})
+    					.catch(function (err) {
+    						// API call failed...
+    						bot.sendMessage({
+    							to: channelID,
+    							message: 'No disc found by that name.'
+    						});
+    					});
+                break;
+                
+                case 'rdisc':
+                    var embedTitle = message.replace('.rdisc', '');
+    				var replyText = [];
+                    var embedFields = [];
+    				var options = {
+    					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/randomdisc/',
+    					//qs: {
+    					//	access_token: 'xxxxx xxxxx' // -> uri + '?access_token=xxxxx%20xxxxx'
+    					//},
+    					headers: {
+    						'User-Agent': 'Request-Promise'
+    					},
+    					json: true // Automatically parses the JSON string in the response
+    				};
+    				rp(options)
+    					.then(function (disc) {
+                            var discName = disc.name;
+    						var pdgaName = disc.pdga_name;
+    						delete disc.id;
+    						delete disc.pdga_name;
+                            delete disc.name;
+                            delete disc.plastics;
+                            delete disc.random_field;
+    						for(var p in disc) {
+    							if (disc[p]) {
+    								replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + disc[p].replace('&#176;', ''))
+    							}
+    						}
+                            embedFields.push({name: discName, value: replyText.join('\n')});
+
+    						bot.sendMessage({
+    							to: channelID,
+    							message: '',
+                                embed: {
+                                    color: 3447003,
+                                    title: embedTitle,
+                                    thumbnail: {
+                                      url: bagPhoto
+                                    },
+                                    fields: embedFields
+                                }
     						});
     					})
     					.catch(function (err) {
@@ -318,10 +415,10 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     var removedDiscs = [];
                     var failedDiscs = [];
                     var discNames = message.replace('.ibag ', '');
-
+                    var cleanUsername = bot.users[userID].username.replace(/[\W_]+/g," ");
                     var options = {
                         method: 'GET',
-                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/ibag/' + userID + '/' + discNames,
+                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/ibag/' + userID + '/' + cleanUsername + '/' + discNames,
                         headers: {
                             'User-Agent': 'Request-Promise'
                         },
@@ -597,6 +694,97 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                 message: 'Bag stats could not be retrieved at this time.',
                             });
                         });
+                break;
+                
+                case 'ourbag':
+                    var embedFields = [];
+
+                    var options = {
+                        method: 'GET',
+                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/ourbag',
+                        headers: {
+                            'User-Agent': 'Request-Promise'
+                        },
+                        json: true // Automatically stringifies the body to JSON
+                    };
+
+                    rp(options)
+                        .then(function (parsedBody) {
+                            // POST succeeded...
+                            for (discCategory in parsedBody) {
+                                embedFields.push({name: discCategory, value: parsedBody[discCategory].join('\n')});
+                            }
+
+                            bot.sendMessage({
+                                to: channelID,
+                                message: '',
+                                embed: {
+                                    color: 3447003,
+                                    title: 'If this discord made a bag...',
+                                    fields: embedFields
+                                }
+                            });
+                        })
+                        .catch(function (err) {
+                            logger.info(err);
+                            // POST failed...
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'Our bag not available. We couldn\'t agree on anything right now.',
+                            });
+                        });
+                break;
+                
+                case 'flightsearch':
+                    var embedFields = [];
+                    var discNames = [];
+                
+                    var fnMatch = args.match(/((\-?\d+\.?\d*|\x)\/){3,4}\-?(\d+\.?\d*|\x)/);
+
+                    if (!fnMatch) {
+                        bot.sendMessage({
+                            to: channelID,
+                            message: 'Invalid flight number format.',
+                        });
+                    }
+                    else {
+                        var flightNumbers = fnMatch[0];
+
+                        var options = {
+                            method: 'GET',
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/flightsearch/' + flightNumbers,
+                            headers: {
+                                'User-Agent': 'Request-Promise'
+                            },
+                            json: true // Automatically stringifies the body to JSON
+                        };
+
+                        rp(options)
+                            .then(function (parsedBody) {
+                                for (disc in parsedBody) {
+                                    discNames.push(parsedBody[disc].name);
+                                }
+                                embedFields.push({name: 'Discs found', value: discNames.join(', ')});
+                                // POST succeeded...
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: '',
+                                    embed: {
+                                        color: 3447003,
+                                        title: 'Search for discs with ' + flightNumbers + ' ... ',
+                                        fields: embedFields
+                                    }
+                                });
+                            })
+                            .catch(function (err) {
+                                logger.info(err);
+                                // POST failed...
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: 'No discs found with those flight numbers.',
+                                });
+                        });
+                    }                    
                 break;
              }
          }
