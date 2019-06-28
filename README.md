@@ -1,7 +1,7 @@
 # DiscBot
 Discord bot for fetching information about disc golf discs
 
-##Summary
+## Summary
 DiscBot is an open source Discord bot created by Aaron Baxter under the GNU General Public License v3.0
 
 Users can interact with DiscBot (using [commands](https://app.pixel5.us/discbot/commands)) to quickly find information about discs, plastics, PDGA statistics, and more. Users may also create their own virtual 'bag' to show others which discs they are carrying and find out what others are using as well.
