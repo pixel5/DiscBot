@@ -319,7 +319,6 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
                             rp(options)
                                 .then(function (parsedBody) {
-                                    logger.info(parsedBody);
                                     // POST succeeded...
                                     bot.sendMessage({
                                         to: channelID,
@@ -392,7 +391,6 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
                     rp(options)
                         .then(function (parsedBody) {
-                            logger.info(parsedBody);
                             // POST succeeded...
                             bot.sendMessage({
                                 to: channelID,
@@ -450,10 +448,9 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         if (removedDiscs.length != 0) {
                            replyText.push('Removed: ' + removedDiscs.join(', '));
                         }
-                        if (failedDiscs[0]) {logger.info(failedDiscs);
+                        if (failedDiscs[0]) {
                            replyText.push('Error (may not exist): ' + failedDiscs.join(', '));
                         }
-                        logger.info(replyText.join('\n'));
                         bot.sendMessage({
                             to: channelID,
                             message: replyText.join('\n'),
@@ -493,7 +490,6 @@ bot.on('message', function (user, userID, channelID, message, event) {
                  break;
 
                  case 'bag':
-                    var pdga_id = 1;
                     var db_user_id = 0;
                     var fnMatch = false;
                     var embedFields = [];
@@ -583,7 +579,6 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
                     rp(options)
                         .then(function (parsedBody) {
-                            logger.info(parsedBody);
                             // POST succeeded...
                             bot.sendMessage({
                                 to: channelID,
@@ -785,6 +780,60 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                 });
                         });
                     }                    
+                break;
+                
+                case 'bagmate':
+                    var db_user_id = 0;
+                    var fnMatch = false;
+                    var embedFields = [];
+                    var moldCount = 0;
+
+                    if (args) {
+                        fnMatch = args.match(/\<@!?[0-9]+\>/);
+                    }
+                    else {
+                        db_user_id = userID;
+                        fnMatch = true;
+                    }
+
+                    if (fnMatch) {
+                        if (db_user_id == 0) {
+                            db_user_id = fnMatch[0].match(/[0-9]+/);
+                        }
+
+                        var options = {
+                            method: 'GET',
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/bagmate/' + db_user_id,
+                            headers: {
+                                'User-Agent': 'Request-Promise'
+                            },
+                            json: true // Automatically stringifies the body to JSON
+                        };
+
+                        rp(options)
+                            .then(function (parsedBody) {
+                                var bagmateUserId = parsedBody.user_id;
+                                embedFields.push({name: 'Bag bros for life', value: bot.users[db_user_id].username + ' and ' + bot.users[bagmateUserId].username 
+                                    + ' carry ' + parsedBody.num_matches + ' of the same discs:'
+                                    + '\n' + parsedBody.matches.join(', ')});  
+
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: '',
+                                    embed: {
+                                        color: 3447003,
+                                        title: bot.users[db_user_id].username + '\'s bagmate is ' + bot.users[bagmateUserId].username + ', how cute! <:blobcouple:369653181921361930>',
+                                        fields: embedFields,
+                                    }
+                                });
+                            })
+                            .catch(function (err) {
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: 'No bagmate found. Maybe check farmersonly.com.'
+                                });
+                        });
+                    }
                 break;
              }
          }
