@@ -140,24 +140,24 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             db_user_id = fnMatch[0].match(/[0-9]+/);
                         }
                         var options = {
-        					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/pdga/' + db_user_id,
-        					headers: {
-        						'User-Agent': 'Request-Promise'
-        					},
-        					json: true // Automatically parses the JSON string in the response
-        				};
-        				rp(options)
-        					.then(function (parsedBody) {
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/pdga/' + db_user_id,
+                            headers: {
+                                'User-Agent': 'Request-Promise'
+                            },
+                            json: true // Automatically parses the JSON string in the response
+                        };
+                        rp(options)
+                            .then(function (parsedBody) {
 
-        						fetchPdga(parsedBody.pdga_id);
-        					})
-        					.catch(function (err) {
-        						// API call failed...
+                                fetchPdga(parsedBody.pdga_id);
+                            })
+                            .catch(function (err) {
+                                // API call failed...
                                 bot.sendMessage({
                                     to: channelID,
                                     message: 'User hasn\'t shared their PDGA number with me!'
                                 });
-        					});
+                            });
                     }
                     else {
                         fetchPdga(args);
@@ -193,19 +193,16 @@ bot.on('message', function (user, userID, channelID, message, event) {
                 case 'disc':
                     logger.info(message);
                     var embedFields = [];
-    				var options = {
-    					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/disc/' + message.replace('.disc ', '').trim(),
-    					//qs: {
-    					//	access_token: 'xxxxx xxxxx' // -> uri + '?access_token=xxxxx%20xxxxx'
-    					//},
-    					headers: {
-    						'User-Agent': 'Request-Promise'
-    					},
-    					json: true // Automatically parses the JSON string in the response
-    				};
-    				rp(options)
-    					.then(function (disc) {
-    						for(var discId in disc) {
+                    var options = {
+                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/disc/' + message.replace('.disc ', '').trim(),
+                        headers: {
+                            'User-Agent': 'Request-Promise'
+                        },
+                        json: true // Automatically parses the JSON string in the response
+                    };
+                    rp(options)
+                        .then(function (disc) {
+                            for(var discId in disc) {
                                 var replyText = [];
                                 
                                 var discName = disc[discId].name;
@@ -216,64 +213,61 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                 
                                 for (var p in disc[discId]) {
                                     if (disc[discId][p]) {
-                                        replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + disc[discId][p].replace('&#176;', ''))
+                                        replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + disc[discId][p].replace('&#176;', '').replace(/(\r\n|\n|\r)/gm, ""))
                                     }
                                 }
                                 
                                 embedFields.push({name: discName, value: replyText.join('\n'), inline: true});
-    						}
+                            }
 
-    						bot.sendMessage({
-    							to: channelID,
-    							message: '',
+                            bot.sendMessage({
+                                to: channelID,
+                                message: '',
                                     embed: {
                                     color: 3447003,
                                     fields: embedFields
                                 }
-    						});
-    					})
-    					.catch(function (err) {
-    						// API call failed...
-    						bot.sendMessage({
-    							to: channelID,
-    							message: 'No disc found by that name.'
-    						});
-    					});
+                            });
+                        })
+                        .catch(function (err) {
+                            // API call failed...
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'No disc found by that name.'
+                            });
+                        });
                 break;
                 
                 case 'rdisc':
                     var embedTitle = message.replace('.rdisc', '');
-    				var replyText = [];
+                    var replyText = [];
                     var embedFields = [];
-    				var options = {
-    					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/randomdisc/',
-    					//qs: {
-    					//	access_token: 'xxxxx xxxxx' // -> uri + '?access_token=xxxxx%20xxxxx'
-    					//},
-    					headers: {
-    						'User-Agent': 'Request-Promise'
-    					},
-    					json: true // Automatically parses the JSON string in the response
-    				};
-    				rp(options)
-    					.then(function (disc) {
+                    var options = {
+                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/randomdisc/',
+                        headers: {
+                            'User-Agent': 'Request-Promise'
+                        },
+                        json: true // Automatically parses the JSON string in the response
+                    };
+                    rp(options)
+                        .then(function (disc) {
                             var discName = disc.name;
-    						var pdgaName = disc.pdga_name;
-    						delete disc.id;
-    						delete disc.pdga_name;
+                            var pdgaName = disc.pdga_name;
+                            delete disc.id;
+                            delete disc.pdga_name;
                             delete disc.name;
                             delete disc.plastics;
                             delete disc.random_field;
-    						for(var p in disc) {
-    							if (disc[p]) {
-    								replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + disc[p].replace('&#176;', ''))
-    							}
-    						}
+                            for(var p in disc) {
+                                if (disc[p]) {
+                                    replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + disc[p].replace('&#176;', ''))
+                                }
+                            }
                             embedFields.push({name: discName, value: replyText.join('\n')});
 
-    						bot.sendMessage({
-    							to: channelID,
-    							message: '',
+                            bot.sendMessage({
+                                to: channelID,
+                                message: '',
                                 embed: {
                                     color: 3447003,
                                     title: embedTitle,
@@ -282,15 +276,15 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                     },
                                     fields: embedFields
                                 }
-    						});
-    					})
-    					.catch(function (err) {
-    						// API call failed...
-    						bot.sendMessage({
-    							to: channelID,
-    							message: 'No disc found by that name.'
-    						});
-    					});
+                            });
+                        })
+                        .catch(function (err) {
+                            // API call failed...
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'No disc found by that name.'
+                            });
+                        });
                 break;
 
                 case 'discupdate':
@@ -312,8 +306,8 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                 method: 'GET',
                                 uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/discupdate/' + discName.replace(",", "%20").trim() + '/' + flightNumbers,
                                 headers: {
-            						'User-Agent': 'Request-Promise'
-            					},
+                                    'User-Agent': 'Request-Promise'
+                                },
                                 json: true // Automatically stringifies the body to JSON
                             };
 
@@ -345,38 +339,35 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
                 case 'plastic':
                     logger.info(args);
-    				var replyText = [];
-    				var options = {
-    					uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/plastic/' + args.replace(",", "%20").trim(),
-    					//qs: {
-    					//	access_token: 'xxxxx xxxxx' // -> uri + '?access_token=xxxxx%20xxxxx'
-    					//},
-    					headers: {
-    						'User-Agent': 'Request-Promise'
-    					},
-    					json: true // Automatically parses the JSON string in the response
-    				};
-    				rp(options)
-    					.then(function (plastic) {
-    						for(var p in plastic) {
-    							if (plastic[p]) {
-    								replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + plastic[p])
-    							}
-    						}
+                    var replyText = [];
+                    var options = {
+                        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/plastic/' + args.replace(",", "%20").trim(),
+                        headers: {
+                            'User-Agent': 'Request-Promise'
+                        },
+                        json: true // Automatically parses the JSON string in the response
+                    };
+                    rp(options)
+                        .then(function (plastic) {
+                            for(var p in plastic) {
+                                if (plastic[p]) {
+                                    replyText.push(p.charAt(0).toUpperCase() + p.slice(1) + ': ' + plastic[p])
+                                }
+                            }
 
-    						bot.sendMessage({
-    							to: channelID,
-    							message: '```' + replyText.join('\n') + '```'
-    						});
-    					})
-    					.catch(function (err) {
-    						// API call failed...
-    						bot.sendMessage({
-    							to: channelID,
-    							message: 'No plastic found by that name.'
-    						});
-    					}
-    				);
+                            bot.sendMessage({
+                                to: channelID,
+                                message: '```' + replyText.join('\n') + '```'
+                            });
+                        })
+                        .catch(function (err) {
+                            // API call failed...
+                            bot.sendMessage({
+                                to: channelID,
+                                message: 'No plastic found by that name.'
+                            });
+                        }
+                    );
                 break;
 
                 case 'mypdga':
@@ -821,7 +812,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
                                     to: channelID,
                                     message: '',
                                     embed: {
-                                        color: 3447003,
+                                        color: 16711820,
                                         title: bot.users[db_user_id].username + '\'s bagmate is ' + bot.users[bagmateUserId].username + ', how cute! <:blobcouple:369653181921361930>',
                                         fields: embedFields,
                                     }
@@ -838,9 +829,20 @@ bot.on('message', function (user, userID, channelID, message, event) {
              }
          }
          else if (message.toLowerCase().includes('<@585833915957379101> sucks') || message.toLowerCase().includes('failed bot') || message.toLowerCase().includes('bad bot')) {
-             bot.sendMessage({
+            var messages = [
+                'Here\'s an idea, <@' + userID + '>, how about you stop throwing nose-up.',
+                '"Hurr durr my name is <@' + userID + '> and i\'m a jump putter."',
+                'Failed user.',
+                'Get your T levels checked, <@' + userID + '>.',
+                'You\'re still out, <@' + userID + '>.',
+                'Big talk from MA4.',
+                'Play it Again Sports has about 40 DX Grooves with <@' + userID + '>\'s name on them.',
+                'Imagine insulting a bot.'
+            ];
+            var insult = messages[Math.floor(Math.random() * messages.length)];
+            bot.sendMessage({
                  to: channelID,
-                 message: 'Here\'s an idea, <@' + userID + '>, how about you stop throwing nose-up.'
+                 message: insult,
              });
          }
      }
