@@ -1,5 +1,6 @@
 # DiscBot
 A Discord bot for disc golfers
+
 Find DiscBot here: https://discord.gg/TPJqzbh
 
 ## Summary
