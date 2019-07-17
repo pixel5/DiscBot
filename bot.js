@@ -32,6 +32,22 @@ bot.on('ready', function (event) {
     });
 });
 
+bot.on('any', function(event) { 
+   if (event.t == "GUILD_MEMBER_REMOVE") {
+      // Leave server if owner leaves
+      if (event.d.user.id == ownerUserID) {
+        bot.leaveServer(event.d.guild_id);
+      }
+      
+      // Send status change event (set to 0)
+      userStatus(event.d.user.id, 0);
+   }
+   else if (event.t == "GUILD_MEMBER_ADD") {
+       // Send status change event (set to 1)
+       userStatus(event.d.user.id, 1);
+   }
+})
+
 bot.on('message', function (user, userID, channelID, message, event) {
     if (channelID in bot.directMessages && message.substring(0,9) != '.dischelp') {
         // Direct Message handling
@@ -71,12 +87,9 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         message: '',
                         embed: {
                             color: 3447003,
-                            thumbnail: {
-                              url: bagPhoto
-                            },
                             fields: [{
                                 name: "How to git gud at DiscBot",
-                                value: "https://app.pixel5.us/discbot/commands"
+                                value: "https://pixel5.dev/discbot/commands"
                             }]
                         }                        
                     });
@@ -94,6 +107,24 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             fields: [{
                                 name: "View the DiscBot project on GitHub",
                                 value: "https://pixel5.github.io/DiscBot/"
+                            }]
+                        }                        
+                    });
+                break;
+                
+                case 'dbservers':
+                    var reply = [];
+                    for (let server of Object.values(bot.servers)) {
+                        reply.push(server.name + ": " + server.id);
+                    }
+                    bot.sendMessage({
+                        to: channelID,
+                        message: '',
+                        embed: {
+                            color: 3447003,
+                            fields: [{
+                                name: "Servers DiscBot is in:",
+                                value: reply.join('\n')
                             }]
                         }                        
                     });
@@ -289,7 +320,7 @@ bot.on('message', function (user, userID, channelID, message, event) {
 
                 case 'discupdate':
                     //logger.info(message.author.id);
-                    if (bot.servers[event.d.guild_id].members[userID].roles.includes('585543893244837899')) {
+                    if (userID == ownerUserID) {
                         var fnMatch = args.match(/(\-?\d{1,3}\d*\.?\d*\/){3,4}\-?\d{1,2}\d*\.?\d*/);
 
                         if (!fnMatch) {
@@ -464,7 +495,12 @@ bot.on('message', function (user, userID, channelID, message, event) {
                     rp(options)
                         .then(function (parsedBody) {
                             for (throwerID of parsedBody.users) {
-                                throwers.push(bot.users[throwerID].username);
+                                if (bot.users[throwerID]) {
+                                    throwers.push(bot.users[throwerID].username);
+                                }
+                                else {
+                                    logger.info('No user found for ID ' + throwerID);
+                                }
                             }
 
                             bot.sendMessage({
@@ -657,10 +693,21 @@ bot.on('message', function (user, userID, channelID, message, event) {
                             embedFields.push({name: 'Top 10 Molds', value: top10Discs.join(', ')});
 
                             // Most molds
-                            embedFields.push({name: 'Disc Collector', value: bot.users[parsedBody.most_molds[0].user_id].username + ' carries the most molds with ' + parsedBody.most_molds[0].count});
+                            if (bot.users[parsedBody.most_molds[0].user_id]) {
+                                embedFields.push({name: 'Disc Collector', value: bot.users[parsedBody.most_molds[0].user_id].username + ' carries the most molds with ' + parsedBody.most_molds[0].count});
+                            }
+                            else {
+                                logger.info('No user found for ID ' + throwerID);
+                            }
 
                             // Fewest molds
-                            embedFields.push({name: 'Philo Fanclub', value: bot.users[parsedBody.fewest_molds[0].user_id].username + ' carries the fewest molds with ' + parsedBody.fewest_molds[0].count});
+                            
+                            if (bot.users[parsedBody.fewest_molds[0].user_id]) {
+                                embedFields.push({name: 'Philo Fanclub', value: bot.users[parsedBody.fewest_molds[0].user_id].username + ' carries the fewest molds with ' + parsedBody.fewest_molds[0].count});
+                            }
+                            else {
+                                logger.info('No user found for ID ' + throwerID);
+                            }
 
                             bot.sendMessage({
                                 to: channelID,
@@ -826,10 +873,117 @@ bot.on('message', function (user, userID, channelID, message, event) {
                         });
                     }
                 break;
+                
+                case 'mystore':
+                    var url = '';
+                    var fnMatch = null;
+                    var passedUrl = message.replace('.mystore','');
+                    
+                    if (args) {
+                        fnMatch = passedUrl.match(/((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)/);
+                    }
+
+                    if (fnMatch) {
+                        url = fnMatch[0];
+
+                        var options = {
+                            method: 'GET',
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/mystore/' + userID + '?url=' + encodeURIComponent(url),
+                            headers: {
+                                'User-Agent': 'Request-Promise'
+                            },
+                            json: true // Automatically stringifies the body to JSON
+                        };
+
+                        rp(options)
+                            .then(function (parsedBody) {
+                                // POST succeeded...
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: 'Store URL updated.',
+                                });
+                            })
+                            .catch(function (err) {
+                                logger.info(err);
+                                // POST failed...
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: 'Could not update your store URL. What did you do?',
+                                });
+                            });
+                    }
+                    else {
+                        bot.sendMessage({
+                            to: channelID,
+                            message: 'Invalid URL.',
+                        });
+                    }
+                break;
+                
+                case 'storelist':
+                case 'store':
+                    var db_user_id = 0;
+                    var fnMatch = false;
+                    var embedFields = [];
+                    var storeList = [];
+                    var slash = '/';
+
+                    if (cmd == 'store' && args) {
+                        fnMatch = args.match(/\<@!?[0-9]+\>/);
+                    }
+                    else if (cmd == 'storelist') {
+                        db_user_id = '';
+                        slash = '';
+                    }                    
+                    else {
+                        db_user_id = userID;
+                        fnMatch = true;
+                    }
+
+                    if (fnMatch || cmd == 'storelist') {
+                        if (db_user_id === 0) {
+                            db_user_id = fnMatch[0].match(/[0-9]+/);
+                        }
+
+                        var options = {
+                            method: 'GET',
+                            uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/store' + slash + db_user_id,
+                            headers: {
+                                'User-Agent': 'Request-Promise'
+                            },
+                            json: true // Automatically stringifies the body to JSON
+                        };
+
+                        rp(options)
+                            .then(function (parsedBody) {
+                                for (s in parsedBody.stores) {
+                                    storeList.push('[' + bot.users[parsedBody.stores[s].user_id].username + '](' + parsedBody.stores[s].url + ')');
+                                }
+                                
+                                embedFields.push({name: 'Stores Found', value: storeList.join('\n')});
+
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: '',
+                                    embed: {
+                                        color: 3447003,
+                                        fields: embedFields,
+                                    }
+                                });
+                            })
+                            .catch(function (err) {
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: 'No stores found!'
+                                });
+                        });
+                    }
+                break;
              }
          }
          else if (message.toLowerCase().includes('<@585833915957379101> sucks') || message.toLowerCase().includes('failed bot') || message.toLowerCase().includes('bad bot')) {
             var messages = [
+                'If you can\'t say anything nice, don\'t say anything at all. Banned.',
                 'Here\'s an idea, <@' + userID + '>, how about you stop throwing nose-up.',
                 '"Hurr durr my name is <@' + userID + '> and i\'m a jump putter."',
                 'Failed user.',
@@ -847,3 +1001,23 @@ bot.on('message', function (user, userID, channelID, message, event) {
          }
      }
 });
+
+function userStatus(userID, statusVal) {
+    var options = {
+        method: 'GET',
+        uri: 'https://' + auth.pixel5_api + '@api.pixel5.us/discbot/userstatus/' + userID + '/' + statusVal,
+        headers: {
+            'User-Agent': 'Request-Promise'
+        },
+        json: true // Automatically stringifies the body to JSON
+    };
+
+    rp(options)
+        .then(function (parsedBody) {
+            logger.info('User status changed to ' + statusVal + ' for user ID: ' + userID);
+        })
+        .catch(function (err) {
+            logger.info('Could not change status to ' + statusVal + ' for user ID: ' + userID);
+    });
+}
+
