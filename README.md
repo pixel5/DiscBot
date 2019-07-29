@@ -1,8 +1,6 @@
 # DiscBot
 A Discord bot for disc golfers
 
-Find DiscBot here: [https://discord.gg/TPJqzbh](https://discord.gg/TPJqzbh)
-
 ## Summary
 DiscBot is an open source Discord bot created by Aaron Baxter under the GNU General Public License v3.0
 
