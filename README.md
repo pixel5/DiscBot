@@ -9,3 +9,5 @@ Users can interact with DiscBot (using [commands](https://app.pixel5.us/discbot/
 DiscBot utilizes [Discord.io](https://github.com/izy521/discord.io), a Node.js library for interfacing with the [Discord API](https://discordapp.com/developers/docs/intro) (Gateway 6). External data is retrieved and stored using the private pixel5.us API (RESTful/Slim API Framework v3), PDGA information is publicly available on [PDGA.com](http://pdga.com/).
 
 ![.bag command screenshot](https://i.imgur.com/sYZDGYC.png)
+
+Last Updated 2020-07-16
